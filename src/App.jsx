@@ -14,10 +14,10 @@ function App() {
       <Header />
       <About />
       <Accessibility />
-      <Footer />
       <Contact />
       <Venues />
       <Guide/>
+      <Footer />
     </div>
   )
 }
