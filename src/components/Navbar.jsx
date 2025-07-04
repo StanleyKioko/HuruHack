@@ -179,7 +179,7 @@ const Navbar = () => {
                                     className='w-full flex items-center px-8 py-2.5 hover:bg-blue-900/30 transition-colors'
                                 >
                                     <FiMapPin className="mr-3 text-blue-400" />
-                                    <span>Venues</span>
+                                    <span>Accesbility</span>
                                 </button>
                             </li>
                             <li>

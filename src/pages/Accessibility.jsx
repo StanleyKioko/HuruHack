@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { FiMessageSquare, FiHelpCircle, FiX } from 'react-icons/fi' // Add these icon imports
 
 const Accessibility = () => {
   // Enhanced venue data with more diverse accessibility options
@@ -129,6 +130,23 @@ const Accessibility = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(3);
   
+  // Add new state for assistance buttons
+  const [isMessageOpen, setIsMessageOpen] = useState(false);
+  const [isAiAgentOpen, setIsAiAgentOpen] = useState(false);
+  
+  // Toggle functions for assistance buttons
+  const toggleMessage = () => {
+    setIsMessageOpen(!isMessageOpen);
+    // Close the AI panel if it's open
+    if (isAiAgentOpen) setIsAiAgentOpen(false);
+  };
+
+  const toggleAiAgent = () => {
+    setIsAiAgentOpen(!isAiAgentOpen);
+    // Close the message panel if it's open
+    if (isMessageOpen) setIsMessageOpen(false);
+  };
+  
   // Update items per page based on screen size
   useEffect(() => {
     const handleResize = () => {
@@ -184,7 +202,7 @@ const Accessibility = () => {
   };
   
   return (
-    <div className='flex flex-col items-center justify-center container mx-auto p-8 md:px-20 lg:px-32 w-full' id='Accessibility'>
+    <div className='relative flex flex-col items-center justify-center container mx-auto p-8 md:px-20 lg:px-32 w-full' id='Accessibility'>
       <h2 className='text-center text-3xl md:text-4xl font-bold mb-4'>Inclusive Venues</h2>
       <p className='text-center text-lg font-light mb-10 max-w-2xl'>
         Dedicated to creating accessible environments for people of all abilities, our venues combine comfort with comprehensive accessibility features.
@@ -278,6 +296,89 @@ const Accessibility = () => {
         <h3 className='text-2xl font-semibold mb-3'>Need Special Accommodations?</h3>
         <p className='mb-6 max-w-2xl mx-auto'>We're committed to making our venues accessible to everyone. Contact us to discuss your specific needs or to request custom accommodations for your next event.</p>
         <a href="#contact" className='inline-block bg-blue-600 text-white px-8 py-3 rounded-full hover:bg-blue-700 transition-all'>Request Accommodations</a>
+      </div>
+      
+      {/* Floating Assistance Buttons - Positioned within the Accessibility section */}
+      <div className="fixed bottom-6 right-6 flex flex-col gap-4 z-40">
+        {/* Message Button */}
+        <div className="relative">
+          <button 
+            onClick={toggleMessage}
+            className="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg flex items-center justify-center transition-all"
+            aria-label="Get accessibility support via messaging"
+          >
+            <FiMessageSquare className="w-6 h-6" />
+          </button>
+          
+          {/* Message popup/tooltip */}
+          {isMessageOpen && (
+            <div className="absolute bottom-16 right-0 w-72 bg-white rounded-lg shadow-xl p-4 transform transition-transform origin-bottom-right">
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="font-semibold">Accessibility Support</h3>
+                <button 
+                  onClick={toggleMessage}
+                  className="text-gray-500 hover:text-gray-700"
+                  aria-label="Close messaging support"
+                >
+                  <FiX className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="bg-gray-100 rounded-lg p-3 mb-3">
+                <p className="text-sm text-gray-600">
+                  Need help with venue accessibility? Describe your requirements and our team will respond promptly.
+                </p>
+              </div>
+              <textarea 
+                className="w-full border border-gray-300 rounded p-2 mb-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
+                placeholder="Describe your accessibility needs..."
+                rows="3"
+              ></textarea>
+              <button className="bg-blue-600 text-white text-sm py-2 px-4 rounded-full hover:bg-blue-700 transition-colors w-full">
+                Send Request
+              </button>
+            </div>
+          )}
+        </div>
+        
+        {/* AI Agent Button */}
+        <div className="relative">
+          <button 
+            onClick={toggleAiAgent}
+            className="bg-purple-600 hover:bg-purple-700 text-white p-4 rounded-full shadow-lg flex items-center justify-center transition-all"
+            aria-label="Get AI assistance with accessibility"
+          >
+            <FiHelpCircle className="w-6 h-6" />
+          </button>
+          
+          {/* AI Agent popup/tooltip */}
+          {isAiAgentOpen && (
+            <div className="absolute bottom-16 right-0 w-72 bg-white rounded-lg shadow-xl p-4 transform transition-transform origin-bottom-right">
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="font-semibold">Accessibility AI Assistant</h3>
+                <button 
+                  onClick={toggleAiAgent}
+                  className="text-gray-500 hover:text-gray-700"
+                  aria-label="Close AI assistant"
+                >
+                  <FiX className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="bg-purple-100 rounded-lg p-3 mb-3">
+                <p className="text-sm text-purple-800">
+                  Hi there! I can help you find venues that match your specific accessibility needs. What are you looking for?
+                </p>
+              </div>
+              <textarea 
+                className="w-full border border-gray-300 rounded p-2 mb-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500" 
+                placeholder="Example: I need wheelchair accessible venues with quiet spaces..."
+                rows="3"
+              ></textarea>
+              <button className="bg-purple-600 text-white text-sm py-2 px-4 rounded-full hover:bg-purple-700 transition-colors w-full">
+                Ask AI Assistant
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )
