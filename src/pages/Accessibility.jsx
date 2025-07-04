@@ -51,7 +51,7 @@ const Accessibility = () => {
     {
       id: 4,
       name: "Beach Resort & Spa",
-      image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.0&auto=format&fit=crop&w=800&q=80",
+      image: "https://images.unsplash.com/photo-1540541338287-41700207dee6?ixlib=rb-4.0.0&auto=format&fit=crop&w=800&q=80",
       description: "Enjoy our fully accessible beachfront resort with dedicated beach wheelchairs and accessible swimming areas. Our spa facilities are designed to accommodate guests with all mobility levels.",
       features: [
         "Beach wheelchairs available free of charge",
@@ -159,22 +159,23 @@ const Accessibility = () => {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Calculate max index to prevent blank pages
+  const maxIndex = Math.max(0, venues.length - slidesToShow);
   
   // Handle arrow navigation
   const nextSlide = () => {
-    setCurrentIndex(prevIndex => 
-      prevIndex + slidesToShow >= venues.length 
-        ? 0 
-        : prevIndex + 1
-    );
+    setCurrentIndex(prevIndex => {
+      const nextIndex = prevIndex + 1;
+      return nextIndex > maxIndex ? 0 : nextIndex;
+    });
   };
   
   const prevSlide = () => {
-    setCurrentIndex(prevIndex => 
-      prevIndex === 0 
-        ? Math.max(0, venues.length - slidesToShow) 
-        : prevIndex - 1
-    );
+    setCurrentIndex(prevIndex => {
+      const nextIndex = prevIndex - 1;
+      return nextIndex < 0 ? maxIndex : nextIndex;
+    });
   };
   
   // Handle touch events for mobile swiping
@@ -201,7 +202,7 @@ const Accessibility = () => {
       nextSlide();
     }, 8000);
     return () => clearInterval(interval);
-  }, [currentIndex, slidesToShow]);
+  }, [currentIndex]);
   
   return (
     <div className='flex flex-col items-center justify-center container mx-auto p-8 md:px-20 lg:px-32 w-full' id='Accessibility'>
@@ -234,8 +235,8 @@ const Accessibility = () => {
           <div 
             className='flex transition-transform duration-500 ease-out'
             style={{ 
-              transform: `translateX(-${currentIndex * (100 / slidesToShow)}%)`,
-              width: `${(venues.length / slidesToShow) * 100}%`
+              transform: `translateX(-${(currentIndex * 100) / (venues.length / slidesToShow)}%)`,
+              width: `${venues.length * (100 / slidesToShow)}%`
             }}
           >
             {venues.map((venue) => (
@@ -251,6 +252,7 @@ const Accessibility = () => {
                       src={venue.image} 
                       alt={venue.name}
                       className='w-full h-full object-cover transition-transform hover:scale-105 duration-500'
+                      loading="lazy"
                     />
                   </div>
                   
@@ -295,11 +297,13 @@ const Accessibility = () => {
         
         {/* Carousel Indicators */}
         <div className='flex justify-center mt-6 gap-1.5'>
-          {Array.from({ length: Math.ceil(venues.length / slidesToShow) }).map((_, index) => (
+          {Array.from({ length: Math.min(venues.length - slidesToShow + 1, venues.length) }).map((_, index) => (
             <button
               key={index}
-              onClick={() => setCurrentIndex(index * slidesToShow)}
-              className={`w-2.5 h-2.5 rounded-full transition-all ${currentIndex / slidesToShow === index ? 'bg-blue-600 w-6' : 'bg-gray-300'}`}
+              onClick={() => setCurrentIndex(Math.min(index, maxIndex))}
+              className={`w-2.5 h-2.5 rounded-full transition-all ${
+                currentIndex === index ? 'bg-blue-600 w-6' : 'bg-gray-300'
+              }`}
               aria-label={`Go to slide ${index + 1}`}
             />
           ))}
