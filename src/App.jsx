@@ -12,9 +12,9 @@ function App() {
     <div className='w-full overflow-hidden'>
       <Header />
       <About />
+      <Guide />
       <Accessibility />
       <Contact />
-      <Guide/>
       <Footer />
     </div>
   )
