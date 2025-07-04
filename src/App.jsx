@@ -4,7 +4,6 @@ import About from './pages/About'
 import Accessibility from './pages/Accessibility'
 import Footer from './components/Footer'
 import Contact from './pages/Contact'
-import Venues from './pages/Venues'
 import Guide from './pages/Guide'
 
 
@@ -15,7 +14,6 @@ function App() {
       <About />
       <Accessibility />
       <Contact />
-      <Venues />
       <Guide/>
       <Footer />
     </div>
