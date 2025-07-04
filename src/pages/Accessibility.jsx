@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 
 const Accessibility = () => {
-  // Venue data with images and descriptions
+  // Enhanced venue data with more diverse accessibility options
   const venues = [
     {
       id: 1,
@@ -11,8 +11,9 @@ const Accessibility = () => {
       features: [
         "Wheelchair accessible entrances and elevators",
         "Full-service accessible restrooms",
-        "Adjustable furniture in all rooms"
-      ]
+        "Visual and auditory fire alarms"
+      ],
+      disability: "Mobility, Visual, Hearing"
     },
     {
       id: 2,
@@ -20,21 +21,23 @@ const Accessibility = () => {
       image: "https://images.unsplash.com/photo-1587825140708-dfaf72ae4b04?ixlib=rb-4.0.0&auto=format&fit=crop&w=800&q=80",
       description: "Host your next corporate meeting or special event in our fully accessible event center.",
       features: [
-        "Trained staff for personalized assistance",
-        "Sign language interpreters available on request",
-        "Assistive listening systems in all meeting rooms"
-      ]
+        "Sign language interpreters available",
+        "Assistive listening systems",
+        "Accessible presentation equipment"
+      ],
+      disability: "Hearing, Speech, Mobility"
     },
     {
       id: 3,
-      name: "Community Recreation Complex",
-      image: "https://images.unsplash.com/photo-1584464491033-06628f3a6b7a?ixlib=rb-4.0.0&auto=format&fit=crop&w=800&q=80",
-      description: "Our recreation complex features inclusive programs and adaptive equipment for activities.",
+      name: "Sensory-Friendly Theater",
+      image: "https://images.unsplash.com/photo-1513106580091-1d82408b8cd6?ixlib=rb-4.0.0&auto=format&fit=crop&w=800&q=80",
+      description: "Enjoy performances in an environment designed for those with sensory sensitivities.",
       features: [
-        "Adaptive equipment for various activities",
-        "Specialized workshops and training sessions",
-        "Regular community support group meetings"
-      ]
+        "Reduced sound and lighting intensity",
+        "Quiet spaces for breaks",
+        "Relaxed audience etiquette"
+      ],
+      disability: "Autism, Sensory Processing, ADHD"
     },
     {
       id: 4,
@@ -44,19 +47,21 @@ const Accessibility = () => {
       features: [
         "Beach wheelchairs available free of charge",
         "Accessible pool with ramp entry",
-        "Spa treatments adapted for all abilities"
-      ]
+        "Tactile maps of the resort"
+      ],
+      disability: "Mobility, Visual, Elderly"
     },
     {
       id: 5,
-      name: "Corporate Meeting Hub",
-      image: "https://images.unsplash.com/photo-1517502884422-41eaead166d4?ixlib=rb-4.0.0&auto=format&fit=crop&w=800&q=80",
-      description: "A modern workspace designed for accessibility and productivity.",
+      name: "Adaptive Sports Complex",
+      image: "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?ixlib=rb-4.0.0&auto=format&fit=crop&w=800&q=80",
+      description: "A sports facility where everyone can participate regardless of physical abilities.",
       features: [
-        "Height-adjustable desks and tables",
-        "Advanced assistive technology available",
-        "Audio induction loop systems installed"
-      ]
+        "Adaptive equipment for various sports",
+        "Trained staff for assistance",
+        "Accessible changing facilities"
+      ],
+      disability: "Physical, Developmental, Veterans"
     },
     {
       id: 6,
@@ -64,10 +69,59 @@ const Accessibility = () => {
       image: "https://images.unsplash.com/photo-1518998053901-5348d3961a04?ixlib=rb-4.0.0&auto=format&fit=crop&w=800&q=80",
       description: "Our arts center provides an inclusive environment for cultural experiences.",
       features: [
-        "Accessible seating with companion seats",
-        "Audio description services for performances",
+        "Touch tours for visual art exhibits",
+        "Audio description services",
         "Tactile exhibits and braille information"
-      ]
+      ],
+      disability: "Visual, Hearing, Cognitive"
+    },
+    {
+      id: 7,
+      name: "Accessible Nature Reserve",
+      image: "https://images.unsplash.com/photo-1501854140801-50d01698950b?ixlib=rb-4.0.0&auto=format&fit=crop&w=800&q=80",
+      description: "Experience nature on accessible trails designed for visitors of all mobility levels.",
+      features: [
+        "Paved, wide trails for wheelchairs",
+        "Tactile maps and braille signage",
+        "Accessible bird watching platforms"
+      ],
+      disability: "Mobility, Visual, Elderly"
+    },
+    {
+      id: 8,
+      name: "Inclusive Children's Museum",
+      image: "https://images.unsplash.com/photo-1505155668933-843980fec62d?ixlib=rb-4.0.0&auto=format&fit=crop&w=800&q=80",
+      description: "A museum where all children can learn and play together regardless of abilities.",
+      features: [
+        "Multisensory exhibits for various abilities",
+        "Quiet rooms for sensory breaks",
+        "Wheelchair accessible play structures"
+      ],
+      disability: "Developmental, Autism, Physical"
+    },
+    {
+      id: 9,
+      name: "Service Dog Friendly Café",
+      image: "https://images.unsplash.com/photo-1517231925375-bf2cb42917a5?ixlib=rb-4.0.0&auto=format&fit=crop&w=800&q=80",
+      description: "A welcoming café environment for those with service animals and all accessibility needs.",
+      features: [
+        "Service animal relief areas",
+        "Braille and large-print menus",
+        "Staff trained in disability etiquette"
+      ],
+      disability: "Visual, PTSD, Mobility, Medical"
+    },
+    {
+      id: 10,
+      name: "Accessible Music Festival Grounds",
+      image: "https://images.unsplash.com/photo-1506157786151-b8491531f063?ixlib=rb-4.0.0&auto=format&fit=crop&w=800&q=80",
+      description: "Enjoy music festivals with accessible viewing platforms and inclusive amenities.",
+      features: [
+        "Elevated viewing platforms",
+        "Sign language interpreters for performances",
+        "Accessible restrooms and camping"
+      ],
+      disability: "Mobility, Hearing, Sensory"
     }
   ];
   
@@ -112,10 +166,21 @@ const Accessibility = () => {
     return () => clearInterval(interval);
   }, [totalPages]);
   
-  // Get current venues to display
+  // Get current venues to display - ensure no blank spaces
   const getCurrentVenues = () => {
     const startIndex = currentPage * itemsPerPage;
-    return venues.slice(startIndex, startIndex + itemsPerPage);
+    // If we don't have enough venues to fill the page, loop back to the beginning
+    let currentVenues = venues.slice(startIndex, startIndex + itemsPerPage);
+    
+    // If we don't have enough venues to fill the current page
+    if (currentVenues.length < itemsPerPage && venues.length > itemsPerPage) {
+      // Get the number of additional venues needed
+      const remaining = itemsPerPage - currentVenues.length;
+      // Add venues from the beginning of the array
+      currentVenues = [...currentVenues, ...venues.slice(0, remaining)];
+    }
+    
+    return currentVenues;
   };
   
   return (
@@ -147,13 +212,16 @@ const Accessibility = () => {
                 className='flex flex-col bg-white rounded-xl shadow-lg overflow-hidden h-full transition-transform hover:-translate-y-1 hover:shadow-xl'
               >
                 {/* Venue Image */}
-                <div className='h-48 overflow-hidden'>
+                <div className='h-48 overflow-hidden relative'>
                   <img 
                     src={venue.image} 
                     alt={venue.name}
                     className='w-full h-full object-cover transition-transform hover:scale-105 duration-500'
                     loading="lazy"
                   />
+                  <div className='absolute top-0 right-0 bg-blue-600 text-white px-3 py-1 text-xs font-semibold rounded-bl-lg'>
+                    {venue.disability}
+                  </div>
                 </div>
                 
                 {/* Venue Content */}
