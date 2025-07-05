@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { FiMessageSquare, FiHelpCircle, FiX, FiMic, FiStopCircle } from 'react-icons/fi' // Added mic icons
+import { FiMessageSquare, FiHelpCircle, FiX, FiMic, FiStopCircle, FiUsers, FiMessageCircle, FiHeart, FiCalendar, FiPlusCircle, FiSearch, FiCheckCircle } from 'react-icons/fi' // Added community icons
 
 const Accessibility = () => {
   // Enhanced venue data with more diverse accessibility options
@@ -126,6 +126,88 @@ const Accessibility = () => {
     }
   ];
   
+  // Communities data
+  const communities = [
+    {
+      id: 1,
+      name: "Mobility Champions",
+      category: "Mobility Disabilities",
+      members: 1245,
+      description: "A supportive community for people with mobility challenges sharing daily tips, advice, and encouragement.",
+      image: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTN8fGRpc2FiaWxpdHl8ZW58MHx8MHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+      events: [
+        { title: "Accessible Trail Adventure", date: "July 20, 2025" },
+        { title: "Mobility Aid Workshop", date: "August 5, 2025" }
+      ],
+      tags: ["Wheelchair", "Crutches", "Prosthetics", "Mobility Aids"]
+    },
+    {
+      id: 2,
+      name: "Vision Support Network",
+      category: "Visual Impairments",
+      members: 978,
+      description: "Connect with others experiencing visual impairments to share resources, technology tips, and experiences.",
+      image: "https://images.unsplash.com/photo-1551958219-acbc608c6377?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTR8fGJsaW5kfGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+      events: [
+        { title: "Screen Reader Workshop", date: "July 15, 2025" },
+        { title: "Accessible Tech Showcase", date: "July 28, 2025" }
+      ],
+      tags: ["Blind", "Low Vision", "Screen Readers", "Braille"]
+    },
+    {
+      id: 3,
+      name: "Deaf Connections",
+      category: "Hearing Disabilities",
+      members: 1567,
+      description: "A vibrant community for deaf and hard-of-hearing individuals to connect, share experiences, and organize events.",
+      image: "https://images.unsplash.com/photo-1630332458162-764f89f40f45?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTB8fHNpZ24lMjBsYW5ndWFnZXxlbnwwfHwwfHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+      events: [
+        { title: "ASL Social Gathering", date: "July 10, 2025" },
+        { title: "Deaf Culture Film Festival", date: "July 25, 2025" }
+      ],
+      tags: ["ASL", "Hearing Aids", "Deaf Culture", "Caption Technology"]
+    },
+    {
+      id: 4,
+      name: "Neurodiverse Alliance",
+      category: "Neurodevelopmental Conditions",
+      members: 1102,
+      description: "Supporting adults and children with autism, ADHD, dyslexia, and other neurodevelopmental conditions.",
+      image: "https://images.unsplash.com/photo-1611171711815-71b12662eb8d?ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8YXV0aXNtfGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+      events: [
+        { title: "Sensory-Friendly Gathering", date: "July 12, 2025" },
+        { title: "Executive Functioning Workshop", date: "August 2, 2025" }
+      ],
+      tags: ["Autism", "ADHD", "Dyslexia", "Sensory Processing"]
+    },
+    {
+      id: 5,
+      name: "Chronic Warriors",
+      category: "Chronic Conditions",
+      members: 2156,
+      description: "A supportive space for those with invisible disabilities and chronic conditions to share coping strategies.",
+      image: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixid=MnwxMjA3fDB8MHxzZWFyY2h8NXx8aGVhbHRofGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+      events: [
+        { title: "Pain Management Techniques", date: "July 18, 2025" },
+        { title: "Wellness & Self-Care Workshop", date: "August 8, 2025" }
+      ],
+      tags: ["Fibromyalgia", "Chronic Fatigue", "Chronic Pain", "Autoimmune"]
+    },
+    {
+      id: 6,
+      name: "Mental Health Allies",
+      category: "Mental Health",
+      members: 1876,
+      description: "Supporting each other through mental health challenges with compassion, understanding, and practical resources.",
+      image: "https://images.unsplash.com/photo-1576678927484-cc907957088c?ixid=MnwxMjA3fDB8MHxzZWFyY2h8OXx8bWVudGFsJTIwaGVhbHRofGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+      events: [
+        { title: "Anxiety Management Group", date: "July 14, 2025" },
+        { title: "Mindfulness & Meditation", date: "July 30, 2025" }
+      ],
+      tags: ["Anxiety", "Depression", "PTSD", "Bipolar"]
+    }
+  ];
+
   // State for the carousel
   const [currentPage, setCurrentPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(3);
@@ -141,6 +223,11 @@ const Accessibility = () => {
   const [aiResponse, setAiResponse] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const MISTRAL_API_KEY = 'f1jrBRLvcFR5Y0pHVy27zCnORrPR4zXJ';
+
+  // States for communities section
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [joinedCommunities, setJoinedCommunities] = useState([]);
   
   // Check for speech recognition support
   useEffect(() => {
@@ -328,6 +415,28 @@ Please provide a helpful, concise response focusing on the most relevant venues 
     return currentVenues;
   };
   
+  // Handle joining/leaving a community
+  const handleJoinCommunity = (communityId) => {
+    if (joinedCommunities.includes(communityId)) {
+      setJoinedCommunities(joinedCommunities.filter(id => id !== communityId));
+    } else {
+      setJoinedCommunities([...joinedCommunities, communityId]);
+    }
+  };
+
+  // Filter communities based on search and category
+  const filteredCommunities = communities.filter(community => {
+    const matchesSearch = community.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                          community.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          community.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+    
+    const matchesCategory = selectedCategory === '' || community.category === selectedCategory;
+    
+    return matchesSearch && matchesCategory;
+  });
+
+  const uniqueCategories = [...new Set(communities.map(community => community.category))];
+  
   return (
     <div className='relative flex flex-col items-center justify-center container mx-auto p-8 md:px-20 lg:px-32 w-full' id='Accessibility'>
       <h2 className='text-center text-3xl md:text-4xl font-bold mb-4'>Inclusive Venues</h2>
@@ -424,6 +533,139 @@ Please provide a helpful, concise response focusing on the most relevant venues 
         <p className='mb-6 max-w-2xl mx-auto'>We're committed to making our venues accessible to everyone. Contact us to discuss your specific needs or to request custom accommodations for your next event.</p>
         <a href="#contact" className='inline-block bg-blue-600 text-white px-8 py-3 rounded-full hover:bg-blue-700 transition-all'>Request Accommodations</a>
       </div>
+      
+      {/* Communities Section */}
+      <section className="mt-20 w-full">
+        <div className="text-center mb-10">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Disability Communities</h2>
+          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            Connect with people who share similar experiences. Join communities focused on specific disabilities to share advice, resources, and build meaningful connections.
+          </p>
+        </div>
+        
+        {/* Search and Filter */}
+        <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+          <div className="relative w-full md:w-1/2">
+            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <input 
+              type="text" 
+              placeholder="Search communities by name, description, or tags..." 
+              className="pl-10 pr-4 py-2 border border-gray-300 rounded-full w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          
+          <div className="flex flex-wrap gap-2 w-full md:w-auto">
+            <button 
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${selectedCategory === '' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+              onClick={() => setSelectedCategory('')}
+            >
+              All
+            </button>
+            {uniqueCategories.map(category => (
+              <button 
+                key={category}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${selectedCategory === category ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}
+                onClick={() => setSelectedCategory(category)}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
+        </div>
+        
+        {/* Communities Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {filteredCommunities.map(community => (
+            <div key={community.id} className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition-all duration-300">
+              <div className="h-48 overflow-hidden relative">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent z-10"></div>
+                <img 
+                  src={community.image} 
+                  alt={community.name} 
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute bottom-0 left-0 p-4 z-20">
+                  <span className="inline-block px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded-full mb-2">
+                    {community.category}
+                  </span>
+                  <h3 className="text-xl font-bold text-white">{community.name}</h3>
+                </div>
+              </div>
+              
+              <div className="p-5">
+                <div className="flex items-center text-gray-500 text-sm mb-3">
+                  <FiUsers className="mr-1" /> {community.members.toLocaleString()} members
+                </div>
+                
+                <p className="text-gray-600 mb-4">{community.description}</p>
+                
+                {/* Tags */}
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {community.tags.map((tag, index) => (
+                    <span key={index} className="inline-block px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-md">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+                
+                {/* Upcoming Events */}
+                {community.events.length > 0 && (
+                  <div className="border-t border-gray-100 pt-3 mb-4">
+                    <h4 className="font-medium text-gray-800 mb-2 flex items-center">
+                      <FiCalendar className="mr-2 text-blue-600" /> Upcoming Events
+                    </h4>
+                    <ul className="space-y-2">
+                      {community.events.map((event, index) => (
+                        <li key={index} className="text-sm">
+                          <span className="font-medium">{event.title}</span>
+                          <span className="text-gray-500 ml-2">{event.date}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                
+                {/* Join Button */}
+                <button 
+                  onClick={() => handleJoinCommunity(community.id)}
+                  className={`w-full py-2 rounded-md font-medium flex items-center justify-center gap-2 transition-all ${
+                    joinedCommunities.includes(community.id) 
+                      ? 'bg-green-100 text-green-700 border border-green-200'
+                      : 'bg-blue-600 hover:bg-blue-700 text-white'
+                  }`}
+                >
+                  {joinedCommunities.includes(community.id) 
+                    ? <><FiCheckCircle /> Joined</> 
+                    : <><FiPlusCircle /> Join Community</>
+                  }
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        {filteredCommunities.length === 0 && (
+          <div className="text-center py-16 bg-gray-50 rounded-xl">
+            <FiMessageCircle className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+            <h3 className="text-xl font-bold text-gray-700 mb-2">No communities found</h3>
+            <p className="text-gray-500">Try adjusting your search criteria or check back later for new communities.</p>
+          </div>
+        )}
+        
+        {/* Create Community CTA */}
+        <div className="mt-12 bg-blue-50 rounded-xl p-8 text-center">
+          <FiHeart className="mx-auto h-12 w-12 text-blue-600 mb-4" />
+          <h3 className="text-2xl font-bold text-blue-800 mb-2">Start Your Own Community</h3>
+          <p className="text-blue-700 mb-6 max-w-2xl mx-auto">
+            Don't see a community that fits your specific needs? Create your own and connect with others who share similar experiences.
+          </p>
+          <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-md font-medium transition-all flex items-center gap-2 mx-auto">
+            <FiPlusCircle /> Create a Community
+          </button>
+        </div>
+      </section>
       
       {/* Enhanced Floating Assistance Buttons */}
       <div className="fixed bottom-6 right-6 flex flex-col gap-4 z-40">

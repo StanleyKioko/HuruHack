@@ -297,7 +297,7 @@ const Guide = () => {
       </div>
       
       {/* Contact Support Section */}
-      <div className='bg-blue-50 rounded-xl p-8 text-center'>
+      {/*<div className='bg-blue-50 rounded-xl p-8 text-center'>
         <h3 className='text-2xl font-bold mb-4'>Need Additional Help?</h3>
         <p className='text-gray-600 mb-6 max-w-2xl mx-auto'>
           Our accessibility support team is available to assist with any questions or concerns you may have about our venues and services.
@@ -310,7 +310,7 @@ const Guide = () => {
             View All FAQs
           </a>
         </div>
-      </div>
+      </div>*/}
     </div>
   )
 }
