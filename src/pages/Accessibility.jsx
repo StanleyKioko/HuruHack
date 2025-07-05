@@ -136,6 +136,12 @@ const Accessibility = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [hasSpeechRecognition, setHasSpeechRecognition] = useState(false);
   
+  // Add new state for AI assistant
+  const [userInput, setUserInput] = useState('');
+  const [aiResponse, setAiResponse] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const MISTRAL_API_KEY = 'f1jrBRLvcFR5Y0pHVy27zCnORrPR4zXJ';
+  
   // Check for speech recognition support
   useEffect(() => {
     // Check if the browser supports the Web Speech API
@@ -144,6 +150,71 @@ const Accessibility = () => {
       'webkitSpeechRecognition' in window
     );
   }, []);
+  
+  // Function to process user query using Mistral AI
+  const processAiQuery = async () => {
+    if (!userInput.trim()) return;
+    
+    setIsLoading(true);
+    setAiResponse(''); // Clear previous response
+    
+    try {
+      // Prepare context about venues for the AI
+      const venuesContext = venues.map(venue => {
+        return `Venue: ${venue.name}
+Description: ${venue.description}
+Disabilities Accommodated: ${venue.disability}
+Features: ${venue.features.join(', ')}`;
+      }).join('\n\n');
+      
+      // Prepare the prompt with context and user query
+      const prompt = `You are HuruAI, an accessibility assistant specializing in helping people find venues that match their accessibility needs. 
+Please answer the following question based on this venue information:
+
+${venuesContext}
+
+User Question: ${userInput}
+
+Please provide a helpful, concise response focusing on the most relevant venues for their needs.`;
+
+      // Call Mistral AI API
+      const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${MISTRAL_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: 'mistral-small-latest', // Using a standard model
+          messages: [
+            {
+              role: 'system',
+              content: 'You are an accessibility assistant helping users find venues that match their accessibility needs. Be concise and helpful.'
+            },
+            {
+              role: 'user',
+              content: prompt
+            }
+          ],
+          temperature: 0.7,
+          max_tokens: 300
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      setAiResponse(data.choices[0].message.content);
+      
+    } catch (error) {
+      console.error('Error calling Mistral AI:', error);
+      setAiResponse('Sorry, I encountered an error while processing your request. Please try again later.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
   
   // Toggle functions for assistance buttons
   const toggleMessage = () => {
@@ -170,18 +241,36 @@ const Accessibility = () => {
     if (isRecording) {
       // Stop recording logic would go here in a full implementation
       setIsRecording(false);
-      // In a real implementation, we would process the audio here
-      // For demonstration purposes, we'll simulate by adding a message to the textarea
-      const textarea = document.getElementById('ai-assistant-input');
-      if (textarea) {
-        textarea.value += "Voice input: I need a wheelchair accessible venue with visual aids. ";
-        textarea.focus();
-      }
     } else {
       // Start recording logic would go here
       setIsRecording(true);
-      // In a real implementation, we would actually start speech recognition here
-      // For now we'll just set the state to show the recording UI
+      
+      // Implementing basic speech recognition
+      if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        
+        recognition.lang = 'en-US';
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+        
+        recognition.start();
+        
+        recognition.onresult = (event) => {
+          const speechResult = event.results[0][0].transcript;
+          setUserInput(prev => prev + ' ' + speechResult);
+          setIsRecording(false);
+        };
+        
+        recognition.onerror = (event) => {
+          console.error('Speech recognition error', event.error);
+          setIsRecording(false);
+        };
+        
+        recognition.onend = () => {
+          setIsRecording(false);
+        };
+      }
     }
   };
   
@@ -396,7 +485,7 @@ const Accessibility = () => {
           
           {/* Enhanced AI Agent popup/tooltip */}
           {isAiAgentOpen && (
-            <div className="absolute bottom-16 right-0 w-80 bg-white rounded-lg shadow-xl p-4 transform transition-transform origin-bottom-right">
+            <div className="absolute bottom-16 right-0 w-96 bg-white rounded-lg shadow-xl p-4 transform transition-transform origin-bottom-right">
               <div className="flex justify-between items-center mb-3">
                 <div className="flex items-center">
                   <div className="bg-purple-600 rounded-full p-1.5 mr-2">
@@ -420,12 +509,22 @@ const Accessibility = () => {
                   You can type or use voice input to ask me anything!
                 </p>
               </div>
+              
+              {/* AI Chat Area - Show responses here */}
+              {aiResponse && (
+                <div className="bg-gray-50 rounded-lg p-3 mb-3 border border-purple-200">
+                  <p className="text-sm">{aiResponse}</p>
+                </div>
+              )}
+              
               <textarea 
                 id="ai-assistant-input"
                 className="w-full border border-gray-300 rounded p-2 mb-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500" 
                 placeholder="Type or use voice to describe your needs..."
                 rows="3"
                 aria-label="Type your request or use voice input"
+                value={userInput}
+                onChange={(e) => setUserInput(e.target.value)}
               ></textarea>
               
               {/* Voice Input Option */}
@@ -458,8 +557,22 @@ const Accessibility = () => {
                     </div>
                   )}
                 </div>
-                <button className="bg-purple-600 text-white text-sm py-2 px-4 rounded-full hover:bg-purple-700 transition-colors">
-                  Ask AI
+                <button 
+                  className={`bg-purple-600 text-white text-sm py-2 px-4 rounded-full hover:bg-purple-700 transition-colors ${isLoading ? 'opacity-70' : ''}`}
+                  onClick={processAiQuery}
+                  disabled={isLoading || !userInput.trim()}
+                >
+                  {isLoading ? (
+                    <span className="flex items-center">
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Processing...
+                    </span>
+                  ) : (
+                    "Ask AI"
+                  )}
                 </button>
               </div>
               
