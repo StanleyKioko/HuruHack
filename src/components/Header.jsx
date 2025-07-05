@@ -55,7 +55,7 @@ const Header = () => {
                       onClick={() => scrollToSection('Accessibility')} 
                       className='inline-block bg-blue-500 text-white px-6 py-2 rounded-full ml-4 hover:bg-opacity-90 transition-all font-medium'
                     >
-                      See Accessibility
+                      See Venues
                     </button>
                 </div>
               </div>

@@ -80,7 +80,7 @@ const Accessibility = () => {
       category: "Mental Health",
       members: 1876,
       description: "Supporting each other through mental health challenges with compassion, understanding, and practical resources.",
-      image: "https://images.unsplash.com/photo-1576678927484-cc907957088c?ixid=MnwxMjA3fDB8MHxzZWFyY2h8OXx8bWVudGFsJTIwaGVhbHRofGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+      image: "https://images.unsplash.com/photo-1576678927484-cc907957088c?ixid=MnwxMjA3fDB8MHxzZWFyY2h8OXx8bWVudGFsJTIoaGVhbHRofGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
       events: [
         { title: "Anxiety Management Group", date: "July 14, 2025" },
         { title: "Mindfulness & Meditation", date: "July 30, 2025" }
@@ -145,7 +145,7 @@ const Accessibility = () => {
   const faqs = [
     {
       question: "How do I request special accommodations for my visit?",
-      answer: "You can request special accommodations when booking your venue or by contacting our support team at least 48 hours before your visit. Our staff will work with you to ensure your specific needs are met."
+      answer: "You can request special accommodations when booking your venue or by contacting our support team via WhatsApp at +1-555-987-6543 at least 48 hours before your visit. Our staff will work with you to ensure your specific needs are met."
     },
     {
       question: "Are service animals allowed in all venues?",
@@ -153,7 +153,7 @@ const Accessibility = () => {
     },
     {
       question: "Do you offer sign language interpreters for events?",
-      answer: "Yes, we can arrange for sign language interpreters for events with advance notice. Please request this service at least one week before your event to ensure availability."
+      answer: "Yes, we can arrange for sign language interpreters for events with advance notice. Please request this service via WhatsApp at +1-555-987-6543 at least one week before your event to ensure availability."
     },
     {
       question: "How do I know which venues are best suited for my specific accessibility needs?",
@@ -161,7 +161,7 @@ const Accessibility = () => {
     },
     {
       question: "Is there accessible transportation to your venues?",
-      answer: "Many of our venues offer accessible transportation services or are located near public transit with accessibility features. Check the specific venue page for transportation information or contact us for assistance."
+      answer: "Many of our venues offer accessible transportation services or are located near public transit with accessibility features. Check the specific venue page for transportation information or contact us via WhatsApp at +1-555-987-6543 for assistance."
     }
   ];
 
@@ -313,166 +313,223 @@ const Accessibility = () => {
 
   // Enhanced knowledge base for AI responses based on website content
   const generateResponse = (query) => {
-    // Convert query to lowercase for easier matching
-    const lowercaseQuery = query.toLowerCase();
-    
-    // Create a list of potential responses
-    const potentialResponses = [];
-    
-    // Accessibility information - Mobility
-    if (lowercaseQuery.includes('wheelchair') || 
-        (lowercaseQuery.includes('mobility') && lowercaseQuery.includes('access'))) {
-      
-      const relevantVenues = venues.filter(v => 
-        v.disability.toLowerCase().includes('mobility') || 
-        v.features.some(f => f.toLowerCase().includes('wheelchair') || f.toLowerCase().includes('elevator'))
+    const lowercaseQuery = query.toLowerCase().trim();
+  
+    // Helper function to calculate relevance score
+    const calculateRelevance = (item, queryWords, type = 'venue') => {
+      let score = 0;
+      const fields = type === 'venue' 
+        ? [item.name, item.description, item.disability, ...item.features]
+        : [item.name, item.description, item.category, ...item.tags];
+  
+      queryWords.forEach(word => {
+        fields.forEach(field => {
+          if (field.toLowerCase().includes(word)) {
+            score += 1;
+            // Boost score for exact disability or tag matches
+            if ((type === 'venue' && field === item.disability) || 
+                (type === 'community' && field === item.category)) {
+              score += 2;
+            }
+          }
+        });
+      });
+      return score;
+    };
+  
+    // Split query into words for better matching
+    const queryWords = lowercaseQuery.split(/\s+/).filter(word => word.length > 2);
+  
+    // Find matching venues
+    const matchingVenues = venues
+      .map(venue => ({
+        venue,
+        score: calculateRelevance(venue, queryWords, 'venue')
+      }))
+      .filter(v => v.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 3); // Limit to top 3 matches
+  
+    // Find matching communities
+    const matchingCommunities = communities
+      .map(community => ({
+        community,
+        score: calculateRelevance(community, queryWords, 'community')
+      }))
+      .filter(c => c.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 3); // Limit to top 3 matches
+  
+    // Specific handling for visual impairments
+    if (lowercaseQuery.includes('visual') || lowercaseQuery.includes('blind') || lowercaseQuery.includes('sight')) {
+      const visualVenues = matchingVenues.filter(v => 
+        v.venue.disability.toLowerCase().includes('visual') || 
+        v.venue.features.some(f => f.toLowerCase().includes('braille') || f.toLowerCase().includes('audio'))
       );
-      
-      const venueNames = relevantVenues.map(v => v.name).join(', ');
-      
-      potentialResponses.push(`All our venues provide wheelchair accessibility features, with ${relevantVenues.length} specifically designed for mobility needs. Some recommended options include: ${venueNames}. Each venue has features like ramps, elevators, and wide doorways ensuring complete mobility access. When booking, you can specify your exact mobility needs, and our staff will ensure everything is ready for your visit.`);
-    }
-    
-    // Service animals
-    if (lowercaseQuery.includes('service animal') || lowercaseQuery.includes('service dog')) {
-      potentialResponses.push("Yes, service animals are welcome in all our venues. We comply with accessibility laws and recognize the important role service animals play in assisting individuals with disabilities. Our Service Dog Friendly Café also provides service animal relief areas and staff trained in disability etiquette.");
-    }
-    
-    // Sign language interpreters
-    if (lowercaseQuery.includes('sign language') || lowercaseQuery.includes('interpreter')) {
-      potentialResponses.push("Yes, we can arrange for sign language interpreters for events with advance notice. Please request this service at least one week before your event to ensure availability. The Deaf Connections community also organizes regular events including an ASL Social Gathering on July 10, 2025 and a Deaf Culture Film Festival on July 25, 2025.");
-    }
-    
-    // Specific venue questions based on disability type
-    if (lowercaseQuery.includes('venue') && lowercaseQuery.includes('best')) {
-      // Check for specific disability mentions
-      if (lowercaseQuery.includes('autism') || lowercaseQuery.includes('sensory')) {
-        const sensoryVenues = venues.filter(v => 
-          v.disability.toLowerCase().includes('sensory') || 
-          v.features.some(f => f.toLowerCase().includes('sensory') || f.toLowerCase().includes('quiet'))
-        );
-        if (sensoryVenues.length > 0) {
-          potentialResponses.push(`For sensory needs, I recommend: ${sensoryVenues.map(v => v.name).join(', ')}. These venues offer features like quiet spaces, reduced sensory stimulation areas, and sensory kits to help manage sensory processing challenges.`);
-        }
-      }
-      
-      if (lowercaseQuery.includes('blind') || lowercaseQuery.includes('visual')) {
-        const visualVenues = venues.filter(v => 
-          v.disability.toLowerCase().includes('visual') || 
-          v.features.some(f => f.toLowerCase().includes('braille') || f.toLowerCase().includes('audio'))
-        );
+      const visualCommunities = matchingCommunities.filter(c => 
+        c.community.category.toLowerCase().includes('visual') || 
+        c.community.tags.some(t => t.toLowerCase().includes('blind') || t.toLowerCase().includes('braille'))
+      );
+  
+      if (visualVenues.length > 0 || visualCommunities.length > 0) {
+        let response = "For visual impairments, I recommend the following:\n\n";
+        
         if (visualVenues.length > 0) {
-          potentialResponses.push(`For visual impairments, I recommend: ${visualVenues.map(v => v.name).join(', ')}. These venues have features like braille signage, high contrast visual elements, audio descriptions, and tactile maps to enhance accessibility.`);
+          response += "Venues:\n" + visualVenues.map(v => 
+            `- ${v.venue.name}: ${v.venue.description} Features include: ${v.venue.features.join(', ')}.`
+          ).join('\n') + '\n\n';
         }
+        
+        if (visualCommunities.length > 0) {
+          response += "Communities:\n" + visualCommunities.map(c => 
+            `- ${c.community.name} (${c.community.members.toLocaleString()} members): ${c.community.description} Upcoming events: ${c.community.events.map(e => e.title + ' on ' + e.date).join(', ')}.`
+          ).join('\n');
+        }
+        
+        return response + "\n\nYou can book these venues or join these communities through our website.";
       }
-      
-      if (lowercaseQuery.includes('deaf') || lowercaseQuery.includes('hearing')) {
-        const hearingVenues = venues.filter(v => 
-          v.disability.toLowerCase().includes('hearing') || 
-          v.features.some(f => f.toLowerCase().includes('caption') || f.toLowerCase().includes('loop'))
-        );
+    }
+  
+    // Specific handling for mobility impairments
+    if (lowercaseQuery.includes('wheelchair') || lowercaseQuery.includes('mobility')) {
+      const mobilityVenues = matchingVenues.filter(v => 
+        v.venue.disability.toLowerCase().includes('mobility') || 
+        v.venue.features.some(f => f.toLowerCase().includes('wheelchair') || f.toLowerCase().includes('elevator'))
+      );
+      const mobilityCommunities = matchingCommunities.filter(c => 
+        c.community.category.toLowerCase().includes('mobility') || 
+        c.community.tags.some(t => t.toLowerCase().includes('wheelchair') || t.toLowerCase().includes('mobility'))
+      );
+  
+      if (mobilityVenues.length > 0 || mobilityCommunities.length > 0) {
+        let response = "For mobility needs, I recommend the following:\n\n";
+        
+        if (mobilityVenues.length > 0) {
+          response += "Venues:\n" + mobilityVenues.map(v => 
+            `- ${v.venue.name}: ${v.venue.description} Features include: ${v.venue.features.join(', ')}.`
+          ).join('\n') + '\n\n';
+        }
+        
+        if (mobilityCommunities.length > 0) {
+          response += "Communities:\n" + mobilityCommunities.map(c => 
+            `- ${c.community.name} (${c.community.members.toLocaleString()} members): ${c.community.description} Upcoming events: ${c.community.events.map(e => e.title + ' on ' + e.date).join(', ')}.`
+          ).join('\n');
+        }
+        
+        return response + "\n\nYou can book these venues or join these communities through our website.";
+      }
+    }
+  
+    // Specific handling for hearing impairments
+    if (lowercaseQuery.includes('deaf') || lowercaseQuery.includes('hearing')) {
+      const hearingVenues = matchingVenues.filter(v => 
+        v.venue.disability.toLowerCase().includes('hearing') || 
+        v.venue.features.some(f => f.toLowerCase().includes('caption') || f.toLowerCase().includes('loop'))
+      );
+      const hearingCommunities = matchingCommunities.filter(c => 
+        c.community.category.toLowerCase().includes('hearing') || 
+        c.community.tags.some(t => t.toLowerCase().includes('asl') || t.toLowerCase().includes('hearing'))
+      );
+  
+      if (hearingVenues.length > 0 || hearingCommunities.length > 0) {
+        let response = "For hearing impairments, I recommend the following:\n\n";
+        
         if (hearingVenues.length > 0) {
-          potentialResponses.push(`For hearing needs, I recommend: ${hearingVenues.map(v => v.name).join(', ')}. These venues offer features such as hearing loops, captioning services, and visual alert systems to ensure a fully accessible experience.`);
+          response += "Venues:\n" + hearingVenues.map(v => 
+            `- ${v.venue.name}: ${v.venue.description} Features include: ${v.venue.features.join(', ')}.`
+          ).join('\n') + '\n\n';
         }
+        
+        if (hearingCommunities.length > 0) {
+          response += "Communities:\n" + hearingCommunities.map(c => 
+            `- ${c.community.name} (${c.community.members.toLocaleString()} members): ${c.community.description} Upcoming events: ${c.community.events.map(e => e.title + ' on ' + e.date).join(', ')}.`
+          ).join('\n');
+        }
+        
+        return response + "\n\nYou can book these venues or join these communities through our website.";
+      }
+    }
+  
+    // Specific handling for sensory or neurodiverse needs
+    if (lowercaseQuery.includes('sensory') || lowercaseQuery.includes('autism') || lowercaseQuery.includes('neurodiverse')) {
+      const sensoryVenues = matchingVenues.filter(v => 
+        v.venue.disability.toLowerCase().includes('sensory') || 
+        v.venue.features.some(f => f.toLowerCase().includes('sensory') || f.toLowerCase().includes('quiet'))
+      );
+      const sensoryCommunities = matchingCommunities.filter(c => 
+        c.community.category.toLowerCase().includes('neurodevelopmental') || 
+        c.community.tags.some(t => t.toLowerCase().includes('autism') || t.toLowerCase().includes('sensory'))
+      );
+  
+      if (sensoryVenues.length > 0 || sensoryCommunities.length > 0) {
+        let response = "For sensory or neurodiverse needs, I recommend the following:\n\n";
+        
+        if (sensoryVenues.length > 0) {
+          response += "Venues:\n" + sensoryVenues.map(v => 
+            `- ${v.venue.name}: ${v.venue.description} Features include: ${v.venue.features.join(', ')}.`
+          ).join('\n') + '\n\n';
+        }
+        
+        if (sensoryCommunities.length > 0) {
+          response += "Communities:\n" + sensoryCommunities.map(c => 
+            `- ${c.community.name} (${c.community.members.toLocaleString()} members): ${c.community.description} Upcoming events: ${c.community.events.map(e => e.title + ' on ' + e.date).join(', ')}.`
+          ).join('\n');
+        }
+        
+        return response + "\n\nYou can book these venues or join these communities through our website.";
+      }
+    }
+  
+    // General venue or community query
+    if (lowercaseQuery.includes('venue') || lowercaseQuery.includes('community')) {
+      let response = "Here are some recommended options based on your query:\n\n";
+      
+      if (matchingVenues.length > 0) {
+        response += "Venues:\n" + matchingVenues.map(v => 
+          `- ${v.venue.name}: ${v.venue.description} Features include: ${v.venue.features.join(', ')}.`
+        ).join('\n') + '\n\n';
       }
       
-      if (potentialResponses.length === 0) {
-        potentialResponses.push("Our venue listings include detailed accessibility information with icons indicating available features. You can filter venues by specific accessibility needs including mobility, visual, hearing, cognitive, and sensory accommodations. Would you like more information about a specific type of accessibility need?");
+      if (matchingCommunities.length > 0) {
+        response += "Communities:\n" + matchingCommunities.map(c => 
+          `- ${c.community.name} (${c.community.members.toLocaleString()} members): ${c.community.description} Upcoming events: ${c.community.events.map(e => e.title + ' on ' + e.date).join(', ')}.`
+        ).join('\n');
+      }
+      
+      if (matchingVenues.length > 0 || matchingCommunities.length > 0) {
+        return response + "\n\nYou can explore more details or book through our website.";
       }
     }
-    
-    // Transportation
-    if (lowercaseQuery.includes('transport') || lowercaseQuery.includes('getting there')) {
-      potentialResponses.push("Many of our venues offer accessible transportation services or are located near public transit with accessibility features. For medical facility transportation, you can contact Patient Transport at 1-888-555-2345. Check each specific venue page for transportation information tailored to that location.");
-    }
-    
-    // Communities
-    if (lowercaseQuery.includes('community') || lowercaseQuery.includes('communities') || 
-        lowercaseQuery.includes('support group')) {
-      potentialResponses.push("We have several disability communities you can join: Mobility Champions (1,245 members), Vision Support Network (978 members), Deaf Connections (1,567 members), Neurodiverse Alliance (1,102 members), Chronic Warriors (2,156 members), and Mental Health Allies (1,876 members). Each community organizes regular events and provides a supportive network for sharing experiences and resources.");
-    }
-    
-    // Emergency contacts
-    if (lowercaseQuery.includes('emergency') || lowercaseQuery.includes('urgent help')) {
-      potentialResponses.push("For emergencies, please call 911. For accessibility medical assistance, contact the Accessibility Medical Helpline at 1-800-222-3333. We also have a Crisis Text Line (Text HOME to 741741) and Mental Health Helpline (1-800-666-7777). The Disability Resource Center (1-800-777-8888) provides community resources and rapid assistance.");
-    }
-    
-    // Contact information
-    if (lowercaseQuery.includes('contact') || lowercaseQuery.includes('phone number') || 
-        lowercaseQuery.includes('email')) {
-      potentialResponses.push(`You can contact us through:\n\nPhone: Main: ${contactInfo.phone.main} or Support: ${contactInfo.phone.support}\nEmail: ${contactInfo.email.info} or ${contactInfo.email.support}\nLocation: ${contactInfo.location}\nHours: ${contactInfo.hours}`);
-    }
-    
-    // Booking process
-    if (lowercaseQuery.includes('book') || lowercaseQuery.includes('reserve') || 
-        lowercaseQuery.includes('visit')) {
-      potentialResponses.push("To book a venue: 1) Find a venue using our accessibility filters, 2) Select your date and time and indicate any special accommodations needed, 3) Receive confirmation and pre-arrival information tailored to your needs, 4) Arrive at the venue where our staff will be prepared to assist with your specific needs. All accessibility features will be ready for your use.");
-    }
-    
-    // Sensory accommodations
-    if (lowercaseQuery.includes('sensory') || lowercaseQuery.includes('autism') || 
-        lowercaseQuery.includes('noise')) {
-      potentialResponses.push("We offer sensory accommodations including quiet spaces, reduced sensory stimulation areas, and sensory kits. Our Sensory-Friendly Theater has reduced sound and lighting intensity and relaxed audience etiquette. The Inclusive Children's Museum has multisensory exhibits, quiet rooms for sensory breaks, and wheelchair accessible play structures. The Neurodiverse Alliance community organizes Sensory-Friendly Gatherings.");
-    }
-    
-    // Visual accessibility
-    if (lowercaseQuery.includes('blind') || lowercaseQuery.includes('visual') || 
-        lowercaseQuery.includes('sight')) {
-      potentialResponses.push("We provide visual accessibility features including braille signage, high contrast visual elements, audio descriptions, and tactile maps. Our Cultural Arts Center offers touch tours for visual art exhibits and tactile exhibits with braille information. The Vision Support Network community organizes Screen Reader Workshops (July 15, 2025) and Accessible Tech Showcases (July 28, 2025).");
-    }
-    
-    // About the company
-    if (lowercaseQuery.includes('about') || lowercaseQuery.includes('company') || 
-        lowercaseQuery.includes('mission')) {
-      potentialResponses.push(`HuruSpaces is committed to creating accessible venues and spaces for people of all abilities. Our mission is ${companyInfo.mission} We have ${companyInfo.experience} of experience, ${companyInfo.projectsCompleted} completed projects, ${companyInfo.clients} happy clients, and have renovated over ${companyInfo.renovatedVenues} venues to ensure accessibility.`);
-    }
-    
-    // Special accommodations
-    if (lowercaseQuery.includes('special') && lowercaseQuery.includes('accommodat')) {
-      potentialResponses.push("You can request special accommodations when booking your venue or by contacting our support team at least 48 hours before your visit. Our staff will work with you to ensure your specific needs are met. We're committed to making our venues accessible to everyone, so please don't hesitate to discuss your requirements.");
-    }
-
-    // Questions about specific communities
-    communities.forEach(community => {
-      if (lowercaseQuery.includes(community.name.toLowerCase()) || 
-          community.tags.some(tag => lowercaseQuery.includes(tag.toLowerCase()))) {
-        potentialResponses.push(`${community.name} is a community with ${community.members} members focused on ${community.category}. ${community.description} They have upcoming events: ${community.events.map(e => e.title + ' on ' + e.date).join(', ')}. Join this community to connect with others who share similar experiences and access specialized resources.`);
-      }
-    });
-    
-    // Check for specific venue inquiries
-    venues.forEach(venue => {
-      if (lowercaseQuery.includes(venue.name.toLowerCase())) {
-        potentialResponses.push(`${venue.name}: ${venue.description} Accessibility features include: ${venue.features.join(', ')}. This venue is suitable for people with ${venue.disability} needs. You can book this venue through our website or by contacting our support team.`);
-      }
-    });
-    
+  
     // FAQ matching
     for (const faq of faqs) {
-      // Create keywords from the question
       const keywords = faq.question.toLowerCase().split(' ')
         .filter(word => word.length > 3)
         .map(word => word.replace(/[?.,]/g, ''));
       
-      // Check if query contains multiple keywords from any FAQ
       const matchCount = keywords.filter(keyword => lowercaseQuery.includes(keyword)).length;
       if (matchCount >= 2) {
-        potentialResponses.push(faq.answer);
+        return faq.answer;
       }
     }
-    
-    // General request for help
-    if (lowercaseQuery.includes('help') || lowercaseQuery.includes('assist')) {
-      potentialResponses.push("I'm HuruAI, your accessibility assistant for HuruSpaces. I can provide information about wheelchair accessibility, service animals, sign language interpreters, venue features, transportation options, community groups, emergency contacts, booking process, and more. How can I assist you with your accessibility needs today?");
+  
+    // Emergency contacts
+    if (lowercaseQuery.includes('emergency') || lowercaseQuery.includes('urgent help')) {
+      return "For emergencies, please call 911. For accessibility medical assistance, contact the Accessibility Medical Helpline at 1-800-222-3333. We also have a Crisis Text Line (Text HOME to 741741) and Mental Health Helpline (1-800-666-7777). The Disability Resource Center (1-800-777-8888) provides community resources and rapid assistance.";
     }
-    
-    // If no specific matches, provide a default response
-    if (potentialResponses.length === 0) {
-      potentialResponses.push("Thank you for your question about " + query + ". I'm HuruAI, specialized in providing information about HuruSpaces' accessible venues and services. We offer a variety of accessibility features including mobility assistance, sensory accommodations, visual and hearing accessibility options, and more. Could you please provide more details about your specific needs so I can give you more targeted information?");
+  
+    // Contact information
+    if (lowercaseQuery.includes('contact') || lowercaseQuery.includes('phone number') || lowercaseQuery.includes('email') || lowercaseQuery.includes('whatsapp')) {
+      return `You can contact us through:\n\nWhatsApp: +1-555-987-6543\nPhone: Main: ${contactInfo.phone.main} or Support: ${contactInfo.phone.support}\nEmail: ${contactInfo.email.info} or ${contactInfo.email.support}\nLocation: ${contactInfo.location}\nHours: ${contactInfo.hours}`;
     }
-    
-    // Return a random response from the potential responses to avoid repetition
-    return potentialResponses[Math.floor(Math.random() * potentialResponses.length)];
+  
+    // About the company
+    if (lowercaseQuery.includes('about') || lowercaseQuery.includes('company') || lowercaseQuery.includes('mission')) {
+      return `HuruSpaces is committed to creating accessible venues and spaces for people of all abilities. Our mission is ${companyInfo.mission} We have ${companyInfo.experience} of experience, ${companyInfo.projectsCompleted} completed projects, ${companyInfo.clients} happy clients, and have renovated over ${companyInfo.renovatedVenues} venues to ensure accessibility.`;
+    }
+  
+    // Default response
+    return "Thank you for your question about " + query + ". I'm HuruAI, specialized in providing information about HuruSpaces' accessible venues and communities. We offer venues and communities for various needs including mobility, visual, hearing, sensory, and neurodiverse accommodations. Could you please provide more details about your specific needs so I can recommend the best options?";
   };
   
   // Function to process user query and generate AI response with speech output
@@ -716,9 +773,17 @@ const Accessibility = () => {
                       ))}
                     </ul>
                     
-                    <button className='mt-4 w-full bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 transition-all font-medium'>
-                      Book This Venue
-                    </button>
+                    <a 
+  href="https://wa.me/+254708967800"
+  target="_blank"
+  rel="noopener noreferrer"
+  className='mt-4 w-full bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 transition-all font-medium flex items-center justify-center'
+>
+  <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+  </svg>
+  Book This Venue
+</a>
                   </div>
                 </div>
               </div>
@@ -898,7 +963,7 @@ const Accessibility = () => {
           <button 
             onClick={toggleMessage}
             className="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg flex items-center justify-center transition-all"
-            aria-label="Get accessibility support via messaging"
+            aria-label="Get accessibility support via WhatsApp"
           >
             <FiMessageSquare className="w-6 h-6" />
           </button>
@@ -907,28 +972,29 @@ const Accessibility = () => {
           {isMessageOpen && (
             <div className="absolute bottom-16 right-0 w-72 bg-white rounded-lg shadow-xl p-4 transform transition-transform origin-bottom-right">
               <div className="flex justify-between items-center mb-3">
-                <h3 className="font-semibold">Accessibility Support</h3>
+                <h3 className="font-semibold">Support Team</h3>
                 <button 
                   onClick={toggleMessage}
                   className="text-gray-500 hover:text-gray-700"
-                  aria-label="Close messaging support"
+                  aria-label="Close WhatsApp support"
                 >
                   <FiX className="w-5 h-5" />
                 </button>
               </div>
               <div className="bg-gray-100 rounded-lg p-3 mb-3">
                 <p className="text-sm text-gray-600">
-                  Need help with venue accessibility? Describe your requirements and our team will respond promptly.
+                  Need help with venue accessibility? Contact us via WhatsApp to discuss your requirements, and our team will respond promptly.
                 </p>
               </div>
-              <textarea 
-                className="w-full border border-gray-300 rounded p-2 mb-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                placeholder="Describe your accessibility needs..."
-                rows="3"
-              ></textarea>
-              <button className="bg-blue-600 text-white text-sm py-2 px-4 rounded-full hover:bg-blue-700 transition-colors w-full">
-                Send Request
-              </button>
+              <a 
+                href="https://wa.me/+254708967800?text=Hello%2C%20I%20need%20assistance%20with%20accessibility%20requirements%20for%20a%20venue."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-green-500 text-white text-sm py-2 px-4 rounded-full hover:bg-green-600 transition-colors w-full flex items-center justify-center gap-2"
+              >
+                <FiMessageSquare className="w-4 h-4" />
+                Contact via WhatsApp
+              </a>
             </div>
           )}
         </div>
@@ -936,7 +1002,7 @@ const Accessibility = () => {
         {/* Enhanced AI Agent Button with label */}
         <div className="relative">
           <div className="absolute -left-40 top-2 bg-purple-600 text-white px-3 py-1 rounded-full text-sm shadow-md animate-pulse whitespace-nowrap">
-            <span className="mr-1">👋</span> AI Assistant Available
+            <span className="mr-16">👋</span> Huru AI
           </div>
           <button 
             onClick={toggleAiAgent}
@@ -957,7 +1023,7 @@ const Accessibility = () => {
                   <div className="bg-purple-600 rounded-full p-1.5 mr-2">
                     <FiHelpCircle className="text-white w-5 h-5" />
                   </div>
-                  <h3 className="font-semibold">HuruAI Accessibility Assistant</h3>
+                  <h3 className="font-semibold">HuruAI</h3>
                 </div>
                 <div className="flex items-center">
                   {/* Speech toggle button */}

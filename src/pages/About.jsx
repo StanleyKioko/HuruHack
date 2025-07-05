@@ -30,15 +30,15 @@ const About = () => {
           {/* Stats grid - better styled with cards */}
           <div className='grid grid-cols-2 gap-6 w-full mb-10'>
             <div className='bg-white p-5 rounded-lg shadow-md hover:shadow-lg transition-shadow'>
-                <p className='text-4xl font-bold text-blue-600'>10+</p>
+                <p className='text-4xl font-bold text-blue-600'>3+</p>
                 <p className='text-gray-700 font-medium mt-1'>Years of Experience</p>
             </div>
             <div className='bg-white p-5 rounded-lg shadow-md hover:shadow-lg transition-shadow'>
-                <p className='text-4xl font-bold text-blue-600'>100+</p>
+                <p className='text-4xl font-bold text-blue-600'>1000+</p>
                 <p className='text-gray-700 font-medium mt-1'>Projects Completed</p>
             </div>
             <div className='bg-white p-5 rounded-lg shadow-md hover:shadow-lg transition-shadow'>
-                <p className='text-4xl font-bold text-blue-600'>50+</p>
+                <p className='text-4xl font-bold text-blue-600'>500+</p>
                 <p className='text-gray-700 font-medium mt-1'>Happy Clients</p>
             </div>
             <div className='bg-white p-5 rounded-lg shadow-md hover:shadow-lg transition-shadow'>

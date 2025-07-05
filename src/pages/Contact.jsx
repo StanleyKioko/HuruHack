@@ -120,7 +120,7 @@ const Contact = () => {
 
   return (
     <>
-      <div className="container mx-auto px-4 py-12 md:px-8 lg:px-16">
+      <div id="Contact" className="container mx-auto px-4 py-12 md:px-8 lg:px-16">
         {/* Page Header */}
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Contact Us</h1>
@@ -331,18 +331,23 @@ const Contact = () => {
                       </div>
                     ))}
                     
-                    <div className="mt-4 pt-3 border-t border-gray-100">
-                      <button className={`flex items-center justify-center w-full py-2 rounded-md ${
-                        category.color === 'red' ? 'bg-red-100 text-red-700 hover:bg-red-200' : 
-                        category.color === 'blue' ? 'bg-blue-100 text-blue-700 hover:bg-blue-200' : 
-                        category.color === 'indigo' ? 'bg-indigo-100 text-indigo-700 hover:bg-indigo-200' : 
-                        category.color === 'green' ? 'bg-green-100 text-green-700 hover:bg-green-200' : 
-                        category.color === 'yellow' ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200' : 
-                        'bg-purple-100 text-purple-700 hover:bg-purple-200'
-                      } transition-all text-sm font-medium`}>
-                        <FiMessageCircle className="mr-2" /> Request assistance
-                      </button>
-                    </div>
+    <div className="mt-4 pt-3 border-t border-gray-100">
+      <a
+        href="https://wa.me/+254708967800"
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`flex items-center justify-center w-full py-2 rounded-md ${
+          category.color === 'red' ? 'bg-red-100 text-red-700 hover:bg-red-200' : 
+          category.color === 'blue' ? 'bg-blue-100 text-blue-700 hover:bg-blue-200' : 
+          category.color === 'indigo' ? 'bg-indigo-100 text-indigo-700 hover:bg-indigo-200' : 
+          category.color === 'green' ? 'bg-green-100 text-green-700 hover:bg-green-200' : 
+          category.color === 'yellow' ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200' : 
+          'bg-purple-100 text-purple-700 hover:bg-purple-200'
+        } transition-all text-sm font-medium`}
+      >
+        <FiMessageCircle className="mr-2" /> Request assistance
+      </a>
+    </div>
                   </div>
                 </div>
               ))}
