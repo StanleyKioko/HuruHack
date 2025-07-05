@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react'
-import { FiMessageSquare, FiHelpCircle, FiX, FiMic, FiStopCircle, FiUsers, FiMessageCircle, FiHeart, FiCalendar, FiPlusCircle, FiSearch, FiCheckCircle } from 'react-icons/fi' // Added community icons
+import React, { useState, useEffect, useRef } from 'react'
+import { FiMessageSquare, FiHelpCircle, FiX, FiMic, FiStopCircle, FiUsers, FiMessageCircle, FiHeart, FiCalendar, FiPlusCircle, FiSearch, FiCheckCircle, FiSend } from 'react-icons/fi' // Added community icons
 
 const Accessibility = () => {
   // Enhanced venue data with more diverse accessibility options
@@ -208,6 +208,100 @@ const Accessibility = () => {
     }
   ];
 
+  // FAQ data for training the AI
+  const faqs = [
+    {
+      question: "How do I request special accommodations for my visit?",
+      answer: "You can request special accommodations when booking your venue or by contacting our support team at least 48 hours before your visit. Our staff will work with you to ensure your specific needs are met."
+    },
+    {
+      question: "Are service animals allowed in all venues?",
+      answer: "Yes, service animals are welcome in all our venues. We comply with accessibility laws and recognize the important role service animals play in assisting individuals with disabilities."
+    },
+    {
+      question: "Do you offer sign language interpreters for events?",
+      answer: "Yes, we can arrange for sign language interpreters for events with advance notice. Please request this service at least one week before your event to ensure availability."
+    },
+    {
+      question: "How do I know which venues are best suited for my specific accessibility needs?",
+      answer: "Our venue listings include detailed accessibility information with icons indicating available features. You can also use our venue filter to search specifically for venues that meet your requirements."
+    },
+    {
+      question: "Is there accessible transportation to your venues?",
+      answer: "Many of our venues offer accessible transportation services or are located near public transit with accessibility features. Check the specific venue page for transportation information or contact us for assistance."
+    }
+  ];
+
+  // Emergency contacts for AI training
+  const emergencyContacts = [
+    {
+      title: "Medical Emergency",
+      contacts: [
+        { name: "Emergency Ambulance", number: "911", description: "24/7 Emergency Medical Services" },
+        { name: "Accessibility Medical Helpline", number: "1-800-222-3333", description: "Medical assistance for people with disabilities" }
+      ]
+    },
+    {
+      title: "Hospital Services",
+      contacts: [
+        { name: "General Hospital", number: "1-888-555-1234", description: "Main reception for accessibility inquiries" },
+        { name: "Patient Transport", number: "1-888-555-2345", description: "Accessible transportation to medical facilities" }
+      ]
+    },
+    {
+      title: "Police & Safety",
+      contacts: [
+        { name: "Emergency Police", number: "911", description: "For immediate danger or emergency" },
+        { name: "Non-Emergency Line", number: "1-800-444-5555", description: "For situations requiring police assistance but not emergencies" }
+      ]
+    },
+    {
+      title: "Community Support",
+      contacts: [
+        { name: "Disability Resource Center", number: "1-800-777-8888", description: "Community resources and rapid assistance" },
+        { name: "Volunteer Support Network", number: "1-800-777-9999", description: "Community volunteers for immediate help" }
+      ]
+    },
+    {
+      title: "Crisis Support",
+      contacts: [
+        { name: "Crisis Text Line", number: "Text HOME to 741741", description: "24/7 crisis support via text" },
+        { name: "Mental Health Helpline", number: "1-800-666-7777", description: "Emergency mental health support" }
+      ]
+    },
+    {
+      title: "General Assistance",
+      contacts: [
+        { name: "Accessibility Assistance", number: "1-800-888-9999", description: "General help for people with disabilities" },
+        { name: "24/7 Support Line", number: "1-800-888-0000", description: "Always available for any accessibility emergency" }
+      ]
+    }
+  ];
+
+  // Contact information for AI training
+  const contactInfo = {
+    location: "123 Accessibility Avenue, Innovation City, IC 10101",
+    phone: {
+      main: "(555) 123-4567",
+      support: "(555) 987-6543"
+    },
+    email: {
+      info: "info@accessiblevenues.com",
+      support: "support@accessiblevenues.com"
+    },
+    hours: "Monday - Friday: 9am - 5pm, Weekend: Closed (Emergency Support Available)"
+  };
+
+  // Company information for AI training
+  const companyInfo = {
+    name: "HuruSpaces",
+    mission: "To create a seamless experience for users by providing top-notch services and support, empowering everyone to access and enjoy venues without limitations.",
+    experience: "10+ years",
+    projectsCompleted: "100+",
+    clients: "50+",
+    renovatedVenues: "100+"
+  };
+
   // State for the carousel
   const [currentPage, setCurrentPage] = useState(0);
   const [itemsPerPage, setItemsPerPage] = useState(3);
@@ -218,12 +312,12 @@ const Accessibility = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [hasSpeechRecognition, setHasSpeechRecognition] = useState(false);
   
-  // Add new state for AI assistant
+  // Add new state for enhanced AI assistant
   const [userInput, setUserInput] = useState('');
-  const [aiResponse, setAiResponse] = useState('');
+  const [conversation, setConversation] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const MISTRAL_API_KEY = 'f1jrBRLvcFR5Y0pHVy27zCnORrPR4zXJ';
-
+  const messagesEndRef = useRef(null);
+  
   // States for communities section
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
@@ -237,67 +331,198 @@ const Accessibility = () => {
       'webkitSpeechRecognition' in window
     );
   }, []);
+
+  // Scroll to bottom of messages when conversation updates
+  useEffect(() => {
+    if (messagesEndRef.current && isAiAgentOpen) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [conversation, isAiAgentOpen]);
+
+  // Knowledge base for AI responses based on website content
+  const generateResponse = (query) => {
+    // Convert query to lowercase for easier matching
+    const lowercaseQuery = query.toLowerCase();
+    
+    // Accessibility information
+    if (lowercaseQuery.includes('wheelchair') || 
+        (lowercaseQuery.includes('mobility') && lowercaseQuery.includes('access'))) {
+      const relevantVenues = venues.filter(venue => 
+        venue.disability.toLowerCase().includes('mobility') || 
+        venue.features.some(feature => feature.toLowerCase().includes('wheelchair'))
+      );
+      
+      let venueNames = relevantVenues.map(venue => venue.name).join(', ');
+      
+      return `All our venues provide wheelchair accessibility features, with ${relevantVenues.length} specifically designed for mobility needs. Some recommended options include: ${venueNames}. Each venue has features like ramps, elevators, and wide doorways ensuring complete mobility access. When booking, you can specify your exact mobility needs, and our staff will ensure everything is ready for your visit.`;
+    }
+    
+    // Service animals
+    if (lowercaseQuery.includes('service animal') || lowercaseQuery.includes('service dog')) {
+      return "Yes, service animals are welcome in all our venues. We comply with accessibility laws and recognize the important role service animals play in assisting individuals with disabilities. Our Service Dog Friendly Café also provides service animal relief areas and staff trained in disability etiquette.";
+    }
+    
+    // Sign language interpreters
+    if (lowercaseQuery.includes('sign language') || lowercaseQuery.includes('interpreter')) {
+      return "Yes, we can arrange for sign language interpreters for events with advance notice. Please request this service at least one week before your event to ensure availability. The Deaf Connections community also organizes regular events including an ASL Social Gathering on July 10, 2025 and a Deaf Culture Film Festival on July 25, 2025.";
+    }
+    
+    // Specific venue questions based on disability type
+    if (lowercaseQuery.includes('venue') && lowercaseQuery.includes('best')) {
+      // Check for specific disability mentions
+      let venueRecommendations = [];
+      
+      if (lowercaseQuery.includes('autism') || lowercaseQuery.includes('sensory')) {
+        const sensoryVenues = venues.filter(v => 
+          v.disability.toLowerCase().includes('autism') || 
+          v.disability.toLowerCase().includes('sensory')
+        );
+        if (sensoryVenues.length) {
+          venueRecommendations.push(`For sensory needs: ${sensoryVenues.map(v => v.name).join(', ')}`);
+        }
+      }
+      
+      if (lowercaseQuery.includes('blind') || lowercaseQuery.includes('visual')) {
+        const visualVenues = venues.filter(v => 
+          v.disability.toLowerCase().includes('visual') || 
+          v.features.some(f => f.toLowerCase().includes('braille') || f.toLowerCase().includes('tactile'))
+        );
+        if (visualVenues.length) {
+          venueRecommendations.push(`For visual impairments: ${visualVenues.map(v => v.name).join(', ')}`);
+        }
+      }
+      
+      if (lowercaseQuery.includes('deaf') || lowercaseQuery.includes('hearing')) {
+        const hearingVenues = venues.filter(v => 
+          v.disability.toLowerCase().includes('hearing') || 
+          v.features.some(f => f.toLowerCase().includes('sign language') || f.toLowerCase().includes('assistive listening'))
+        );
+        if (hearingVenues.length) {
+          venueRecommendations.push(`For hearing needs: ${hearingVenues.map(v => v.name).join(', ')}`);
+        }
+      }
+      
+      if (venueRecommendations.length > 0) {
+        return `Based on your needs, I'd recommend: ${venueRecommendations.join('. ')}. Each venue has detailed accessibility information available. You can use our venue filter to search for specific features that meet your requirements.`;
+      }
+      
+      return "Our venue listings include detailed accessibility information with icons indicating available features. You can filter venues by specific accessibility needs including mobility, visual, hearing, cognitive, and sensory accommodations. Would you like more information about a specific type of accessibility need?";
+    }
+    
+    // Transportation
+    if (lowercaseQuery.includes('transport') || lowercaseQuery.includes('getting there')) {
+      return "Many of our venues offer accessible transportation services or are located near public transit with accessibility features. For medical facility transportation, you can contact Patient Transport at 1-888-555-2345. Check each specific venue page for transportation information tailored to that location.";
+    }
+    
+    // Communities
+    if (lowercaseQuery.includes('community') || lowercaseQuery.includes('communities') || 
+        lowercaseQuery.includes('support group')) {
+      return "We have several disability communities you can join: Mobility Champions (1,245 members), Vision Support Network (978 members), Deaf Connections (1,567 members), Neurodiverse Alliance (1,102 members), Chronic Warriors (2,156 members), and Mental Health Allies (1,876 members). Each community organizes regular events and provides a supportive network for sharing experiences and resources.";
+    }
+    
+    // Emergency contacts
+    if (lowercaseQuery.includes('emergency') || lowercaseQuery.includes('urgent help')) {
+      return "For emergencies, please call 911. For accessibility medical assistance, contact the Accessibility Medical Helpline at 1-800-222-3333. We also have a Crisis Text Line (Text HOME to 741741) and Mental Health Helpline (1-800-666-7777). The Disability Resource Center (1-800-777-8888) provides community resources and rapid assistance.";
+    }
+    
+    // Contact information
+    if (lowercaseQuery.includes('contact') || lowercaseQuery.includes('phone number') || 
+        lowercaseQuery.includes('email')) {
+      return `You can contact us through:\n\nPhone: Main: ${contactInfo.phone.main} or Support: ${contactInfo.phone.support}\nEmail: ${contactInfo.email.info} or ${contactInfo.email.support}\nLocation: ${contactInfo.location}\nHours: ${contactInfo.hours}`;
+    }
+    
+    // Booking process
+    if (lowercaseQuery.includes('book') || lowercaseQuery.includes('reserve') || 
+        lowercaseQuery.includes('visit')) {
+      return "To book a venue: 1) Find a venue using our accessibility filters, 2) Select your date and time and indicate any special accommodations needed, 3) Receive confirmation and pre-arrival information tailored to your needs, 4) Arrive at the venue where our staff will be prepared to assist with your specific needs. All accessibility features will be ready for your use.";
+    }
+    
+    // Sensory accommodations
+    if (lowercaseQuery.includes('sensory') || lowercaseQuery.includes('autism') || 
+        lowercaseQuery.includes('noise')) {
+      return "We offer sensory accommodations including quiet spaces, reduced sensory stimulation areas, and sensory kits. Our Sensory-Friendly Theater has reduced sound and lighting intensity and relaxed audience etiquette. The Inclusive Children's Museum has multisensory exhibits, quiet rooms for sensory breaks, and wheelchair accessible play structures. The Neurodiverse Alliance community organizes Sensory-Friendly Gatherings.";
+    }
+    
+    // Visual accessibility
+    if (lowercaseQuery.includes('blind') || lowercaseQuery.includes('visual') || 
+        lowercaseQuery.includes('sight')) {
+      return "We provide visual accessibility features including braille signage, high contrast visual elements, audio descriptions, and tactile maps. Our Cultural Arts Center offers touch tours for visual art exhibits and tactile exhibits with braille information. The Vision Support Network community organizes Screen Reader Workshops (July 15, 2025) and Accessible Tech Showcases (July 28, 2025).";
+    }
+    
+    // About the company
+    if (lowercaseQuery.includes('about') || lowercaseQuery.includes('company') || 
+        lowercaseQuery.includes('mission')) {
+      return `HuruSpaces is committed to creating accessible venues and spaces for people of all abilities. Our mission is ${companyInfo.mission} We have ${companyInfo.experience} of experience, ${companyInfo.projectsCompleted} completed projects, ${companyInfo.clients} happy clients, and have renovated over ${companyInfo.renovatedVenues} venues to ensure accessibility.`;
+    }
+    
+    // Special accommodations
+    if (lowercaseQuery.includes('special') && lowercaseQuery.includes('accommodat')) {
+      return "You can request special accommodations when booking your venue or by contacting our support team at least 48 hours before your visit. Our staff will work with you to ensure your specific needs are met. We're committed to making our venues accessible to everyone, so please don't hesitate to discuss your requirements.";
+    }
+
+    // Questions about specific communities
+    communities.forEach(community => {
+      if (lowercaseQuery.includes(community.name.toLowerCase()) || 
+          community.tags.some(tag => lowercaseQuery.includes(tag.toLowerCase()))) {
+        return `${community.name} is a community with ${community.members} members focused on ${community.category}. ${community.description} They have upcoming events: ${community.events.map(e => e.title + ' on ' + e.date).join(', ')}. Join this community to connect with others who share similar experiences and access specialized resources.`;
+      }
+    });
+    
+    // Check for specific venue inquiries
+    venues.forEach(venue => {
+      if (lowercaseQuery.includes(venue.name.toLowerCase())) {
+        return `${venue.name}: ${venue.description} Accessibility features include: ${venue.features.join(', ')}. This venue is suitable for people with ${venue.disability} needs. You can book this venue through our website or by contacting our support team.`;
+      }
+    });
+    
+    // FAQ matching
+    for (const faq of faqs) {
+      // Create keywords from the question
+      const keywords = faq.question.toLowerCase().split(' ')
+        .filter(word => word.length > 3)
+        .map(word => word.replace(/[?.,]/g, ''));
+      
+      // Check if query contains multiple keywords from any FAQ
+      const matchCount = keywords.filter(keyword => lowercaseQuery.includes(keyword)).length;
+      if (matchCount >= 2) {
+        return faq.answer;
+      }
+    }
+    
+    // General request for help
+    if (lowercaseQuery.includes('help') || lowercaseQuery.includes('assist')) {
+      return "I'm HuruAI, your accessibility assistant for HuruSpaces. I can provide information about wheelchair accessibility, service animals, sign language interpreters, venue features, transportation options, community groups, emergency contacts, booking process, and more. How can I assist you with your accessibility needs today?";
+    }
+    
+    // Default response if no specific matches
+    return "Thank you for your question about " + query + ". I'm HuruAI, specialized in providing information about HuruSpaces' accessible venues and services. We offer a variety of accessibility features including mobility assistance, sensory accommodations, visual and hearing accessibility options, and more. Could you please provide more details about your specific needs so I can give you more targeted information?";
+  };
   
-  // Function to process user query using Mistral AI
+  // Function to process user query and generate AI response
   const processAiQuery = async () => {
     if (!userInput.trim()) return;
     
+    // Add user message to conversation
+    const userMessage = userInput.trim();
+    setConversation(prev => [...prev, { sender: 'user', text: userMessage }]);
+    setUserInput('');
     setIsLoading(true);
-    setAiResponse(''); // Clear previous response
     
     try {
-      // Prepare context about venues for the AI
-      const venuesContext = venues.map(venue => {
-        return `Venue: ${venue.name}
-Description: ${venue.description}
-Disabilities Accommodated: ${venue.disability}
-Features: ${venue.features.join(', ')}`;
-      }).join('\n\n');
+      // Simulate network delay to make it feel more natural
+      await new Promise(resolve => setTimeout(resolve, 800));
       
-      // Prepare the prompt with context and user query
-      const prompt = `You are HuruAI, an accessibility assistant specializing in helping people find venues that match their accessibility needs. 
-Please answer the following question based on this venue information:
-
-${venuesContext}
-
-User Question: ${userInput}
-
-Please provide a helpful, concise response focusing on the most relevant venues for their needs.`;
-
-      // Call Mistral AI API
-      const response = await fetch('https://api.mistral.ai/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${MISTRAL_API_KEY}`
-        },
-        body: JSON.stringify({
-          model: 'mistral-small-latest', // Using a standard model
-          messages: [
-            {
-              role: 'system',
-              content: 'You are an accessibility assistant helping users find venues that match their accessibility needs. Be concise and helpful.'
-            },
-            {
-              role: 'user',
-              content: prompt
-            }
-          ],
-          temperature: 0.7,
-          max_tokens: 300
-        })
-      });
+      // Generate AI response from our comprehensive knowledge base
+      const response = generateResponse(userMessage);
       
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      setAiResponse(data.choices[0].message.content);
-      
+      // Add AI response to conversation
+      setConversation(prev => [...prev, { sender: 'ai', text: response }]);
     } catch (error) {
-      console.error('Error calling Mistral AI:', error);
-      setAiResponse('Sorry, I encountered an error while processing your request. Please try again later.');
+      console.error('Error processing query:', error);
+      setConversation(prev => [...prev, { 
+        sender: 'ai', 
+        text: 'Sorry, I encountered an error while processing your request. Please try again later.' 
+      }]);
     } finally {
       setIsLoading(false);
     }
@@ -359,6 +584,18 @@ Please provide a helpful, concise response focusing on the most relevant venues 
         };
       }
     }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      processAiQuery();
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    processAiQuery();
   };
   
   // Update items per page based on screen size
@@ -725,9 +962,9 @@ Please provide a helpful, concise response focusing on the most relevant venues 
             </span>
           </button>
           
-          {/* Enhanced AI Agent popup/tooltip */}
+          {/* Enhanced AI Agent popup/tooltip - Now with conversation history */}
           {isAiAgentOpen && (
-            <div className="absolute bottom-16 right-0 w-96 bg-white rounded-lg shadow-xl p-4 transform transition-transform origin-bottom-right">
+            <div className="absolute bottom-16 right-0 w-96 bg-white rounded-lg shadow-xl p-4 transform transition-transform origin-bottom-right max-h-[500px] flex flex-col">
               <div className="flex justify-between items-center mb-3">
                 <div className="flex items-center">
                   <div className="bg-purple-600 rounded-full p-1.5 mr-2">
@@ -743,85 +980,115 @@ Please provide a helpful, concise response focusing on the most relevant venues 
                   <FiX className="w-5 h-5" />
                 </button>
               </div>
-              <div className="bg-purple-100 rounded-lg p-3 mb-3">
-                <p className="text-sm text-purple-800">
-                  Hi there! I'm your AI accessibility assistant. I can help you find venues that match your specific needs or answer questions about accessibility features.
-                </p>
-                <p className="text-xs text-purple-700 mt-2 italic">
-                  You can type or use voice input to ask me anything!
-                </p>
-              </div>
               
-              {/* AI Chat Area - Show responses here */}
-              {aiResponse && (
-                <div className="bg-gray-50 rounded-lg p-3 mb-3 border border-purple-200">
-                  <p className="text-sm">{aiResponse}</p>
-                </div>
-              )}
-              
-              <textarea 
-                id="ai-assistant-input"
-                className="w-full border border-gray-300 rounded p-2 mb-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500" 
-                placeholder="Type or use voice to describe your needs..."
-                rows="3"
-                aria-label="Type your request or use voice input"
-                value={userInput}
-                onChange={(e) => setUserInput(e.target.value)}
-              ></textarea>
-              
-              {/* Voice Input Option */}
-              <div className="flex justify-between items-center">
-                <div className="flex-1">
-                  <button 
-                    onClick={toggleRecording}
-                    disabled={!hasSpeechRecognition}
-                    className={`flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-sm 
-                      ${isRecording 
-                        ? 'bg-red-100 text-red-600 hover:bg-red-200' 
-                        : 'bg-purple-100 text-purple-600 hover:bg-purple-200'} 
-                      ${!hasSpeechRecognition ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-                    aria-label={isRecording ? "Stop voice recording" : "Start voice recording"}
+              {/* Conversation Area - Scrollable */}
+              <div className="flex-1 overflow-y-auto mb-3 max-h-[300px] min-h-[200px]">
+                {/* Welcome message - only show if no conversation */}
+                {conversation.length === 0 && (
+                  <div className="bg-purple-100 rounded-lg p-3 mb-3">
+                    <p className="text-sm text-purple-800">
+                      Hi there! I'm your AI accessibility assistant. I can help you find venues that match your specific needs or answer questions about accessibility features.
+                    </p>
+                    <p className="text-xs text-purple-700 mt-2 italic">
+                      You can type or use voice input to ask me anything about:
+                    </p>
+                    <ul className="text-xs text-purple-700 mt-1 list-disc pl-4">
+                      <li>Accessible venues and their features</li>
+                      <li>Community groups and events</li>
+                      <li>Service animal policies</li>
+                      <li>Sign language interpreters</li>
+                      <li>Booking process and accommodations</li>
+                      <li>Emergency contacts and support</li>
+                    </ul>
+                  </div>
+                )}
+                
+                {/* Conversation messages */}
+                {conversation.map((message, index) => (
+                  <div 
+                    key={index} 
+                    className={`mb-3 ${
+                      message.sender === 'user' 
+                        ? 'flex justify-end' 
+                        : 'flex justify-start'
+                    }`}
                   >
-                    {isRecording 
-                      ? <><FiStopCircle className="w-4 h-4" /> Recording...</>
-                      : <><FiMic className="w-4 h-4" /> Voice Input</>
-                    }
-                  </button>
-                  {isRecording && (
-                    <div className="flex justify-center mt-1">
-                      <div className="flex gap-1">
-                        <div className="w-1.5 h-4 bg-purple-600 rounded-full animate-pulse" style={{animationDelay: '0ms'}}></div>
-                        <div className="w-1.5 h-5 bg-purple-600 rounded-full animate-pulse" style={{animationDelay: '200ms'}}></div>
-                        <div className="w-1.5 h-3 bg-purple-600 rounded-full animate-pulse" style={{animationDelay: '400ms'}}></div>
-                        <div className="w-1.5 h-6 bg-purple-600 rounded-full animate-pulse" style={{animationDelay: '600ms'}}></div>
-                        <div className="w-1.5 h-2 bg-purple-600 rounded-full animate-pulse" style={{animationDelay: '800ms'}}></div>
+                    <div 
+                      className={`rounded-lg p-3 max-w-[85%] ${
+                        message.sender === 'user' 
+                          ? 'bg-purple-600 text-white' 
+                          : 'bg-gray-100 text-gray-800'
+                      }`}
+                    >
+                      <p className="text-sm whitespace-pre-wrap">{message.text}</p>
+                    </div>
+                  </div>
+                ))}
+                
+                {/* Loading indicator */}
+                {isLoading && (
+                  <div className="flex justify-start mb-3">
+                    <div className="bg-gray-100 rounded-lg p-3">
+                      <div className="flex items-center space-x-2">
+                        <div className="flex space-x-1">
+                          <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
+                          <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{animationDelay: '200ms'}}></div>
+                          <div className="w-2 h-2 bg-purple-600 rounded-full animate-bounce" style={{animationDelay: '400ms'}}></div>
+                        </div>
+                        <span className="text-sm text-gray-500">Thinking...</span>
                       </div>
                     </div>
-                  )}
-                </div>
-                <button 
-                  className={`bg-purple-600 text-white text-sm py-2 px-4 rounded-full hover:bg-purple-700 transition-colors ${isLoading ? 'opacity-70' : ''}`}
-                  onClick={processAiQuery}
-                  disabled={isLoading || !userInput.trim()}
-                >
-                  {isLoading ? (
-                    <span className="flex items-center">
-                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      Processing...
-                    </span>
-                  ) : (
-                    "Ask AI"
-                  )}
-                </button>
+                  </div>
+                )}
+                
+                {/* This invisible div helps us scroll to the bottom */}
+                <div ref={messagesEndRef} />
               </div>
+              
+              {/* Input form */}
+              <form onSubmit={handleSubmit} className="mt-2">
+                <div className="flex items-center gap-2">
+                  <div className="relative flex-1">
+                    <input
+                      type="text"
+                      value={userInput}
+                      onChange={(e) => setUserInput(e.target.value)}
+                      onKeyPress={handleKeyPress}
+                      placeholder="Ask about accessibility needs..."
+                      className="w-full border border-gray-300 rounded-full py-2 px-4 pr-10 focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
+                      disabled={isLoading}
+                    />
+                    {/* Voice input button (inside input) */}
+                    {hasSpeechRecognition && (
+                      <button 
+                        type="button"
+                        onClick={toggleRecording}
+                        className={`absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-purple-600 ${isRecording ? 'text-red-500 animate-pulse' : ''}`}
+                        aria-label={isRecording ? "Stop recording" : "Start voice input"}
+                      >
+                        {isRecording ? <FiStopCircle className="w-5 h-5" /> : <FiMic className="w-5 h-5" />}
+                      </button>
+                    )}
+                  </div>
+                  
+                  {/* Send button */}
+                  <button
+                    type="submit"
+                    disabled={isLoading || !userInput.trim()}
+                    className={`bg-purple-600 text-white p-2 rounded-full hover:bg-purple-700 transition-colors ${
+                      (isLoading || !userInput.trim()) ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
+                    aria-label="Send message"
+                  >
+                    <FiSend className="w-5 h-5" />
+                  </button>
+                </div>
+              </form>
               
               {/* Accessibility info */}
               <div className="mt-3 pt-3 border-t border-gray-200 text-xs text-gray-500">
                 <p>
-                  This AI assistant is optimized for accessibility and can help with vision, mobility, hearing, and cognitive needs.
+                  This AI assistant is trained on HuruSpaces content and can help with vision, mobility, hearing, and cognitive accessibility needs.
                 </p>
               </div>
             </div>
