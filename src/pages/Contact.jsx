@@ -114,7 +114,7 @@ const Contact = () => {
                   />
                 </div>
                 
-                <div className='flex flex-col'>
+                {/*<div className='flex flex-col'>
                   <label htmlFor="subject" className='text-gray-700 font-medium mb-2'>Subject</label>
                   <select 
                     id="subject" 
@@ -128,7 +128,7 @@ const Contact = () => {
                     <option value="feedback">Feedback</option>
                     <option value="support">Technical Support</option>
                   </select>
-                </div>
+                </div>*/}
               </div>
               
               {/* Message Field */}
@@ -143,7 +143,7 @@ const Contact = () => {
               </div>
               
               {/* Accessibility Needs */}
-              <div className='flex flex-col'>
+              {/*<div className='flex flex-col'>
                 <label htmlFor="accessibility" className='text-gray-700 font-medium mb-2'>Specific Accessibility Needs (Optional)</label>
                 <textarea 
                   id="accessibility" 
