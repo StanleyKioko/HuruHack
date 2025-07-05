@@ -8,6 +8,23 @@ const Header = () => {
     // This will help us verify in the console if the image path is correct
   }, []);
 
+  // Function to handle smooth scrolling for the Header buttons
+  const scrollToSection = (sectionId) => {
+    const section = document.getElementById(sectionId);
+    
+    if (section) {
+      // Add offset for fixed navbar
+      const yOffset = -80; 
+      const y = section.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      
+      // Scroll to section with smooth behavior
+      window.scrollTo({ 
+        top: y,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   return (
     <div 
       className='relative min-h-screen flex flex-col w-full' 
@@ -28,8 +45,18 @@ const Header = () => {
                   Welcome to <span className='block mt-2 md:mt-3'>HuruSpaces</span>
                 </h2>
                 <div className='mt-8'>
-                    <a href="#explore" className='inline-block bg-white text-black px-6 py-2 rounded-full hover:bg-opacity-90 transition-all font-medium'>Explore</a>
-                    <a href="#venues" className='inline-block bg-blue-500 text-white px-6 py-2 rounded-full ml-4 hover:bg-opacity-90 transition-all font-medium'>See Venues</a>
+                    <button 
+                      onClick={() => scrollToSection('About')} 
+                      className='inline-block bg-white text-black px-6 py-2 rounded-full hover:bg-opacity-90 transition-all font-medium'
+                    >
+                      Explore
+                    </button>
+                    <button 
+                      onClick={() => scrollToSection('Accessibility')} 
+                      className='inline-block bg-blue-500 text-white px-6 py-2 rounded-full ml-4 hover:bg-opacity-90 transition-all font-medium'
+                    >
+                      See Accessibility
+                    </button>
                 </div>
               </div>
           </div>

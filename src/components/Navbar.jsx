@@ -79,10 +79,10 @@ const Navbar = () => {
                         </li>
                         <li>
                           <button 
-                            onClick={() => scrollToSection('Venues')} 
-                            className={`cursor-pointer hover:text-blue-300 transition-colors ${activeSection === 'Venues' ? 'text-blue-300' : ''}`}
+                            onClick={() => scrollToSection('Accessibility')} 
+                            className={`cursor-pointer hover:text-blue-300 transition-colors ${activeSection === 'Accessibility' ? 'text-blue-300' : ''}`}
                           >
-                            Venues
+                            Accessibility
                           </button>
                         </li>
                         <li>
@@ -175,11 +175,11 @@ const Navbar = () => {
                             </li>
                             <li>
                                 <button 
-                                    onClick={() => scrollToSection('Venues')} 
+                                    onClick={() => scrollToSection('Accessibility')} 
                                     className='w-full flex items-center px-8 py-2.5 hover:bg-blue-900/30 transition-colors'
                                 >
                                     <FiMapPin className="mr-3 text-blue-400" />
-                                    <span>Accesbility</span>
+                                    <span>Accessibility</span>
                                 </button>
                             </li>
                             <li>
