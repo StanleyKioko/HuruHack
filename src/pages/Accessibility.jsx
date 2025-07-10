@@ -205,8 +205,8 @@ const Accessibility = () => {
     {
       title: "General Assistance",
       contacts: [
-        { name: "Accessibility Assistance", number: "1-800-888-9999", description: "General help for people with disabilities" },
-        { name: "24/7 Support Line", number: "1-800-888-0000", description: "Always available for any accessibility emergency" }
+        { name: "Accessibility Assistance", number: "+254756764589", description: "General help for people with disabilities" },
+        { name: "24/7 Support Line", number: "+254765453423", description: "Always available for any accessibility emergency" }
       ]
     }
   ];
@@ -215,8 +215,8 @@ const Accessibility = () => {
   const contactInfo = {
     location: "123 Accessibility Avenue, Innovation City, IC 10101",
     phone: {
-      main: "(555) 123-4567",
-      support: "(555) 987-6543"
+      main: "+254703135338",
+      support: "+254703135339"
     },
     email: {
       info: "info@accessiblevenues.com",
